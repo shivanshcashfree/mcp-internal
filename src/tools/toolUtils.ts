@@ -13,6 +13,14 @@ export function createToolHandler(tool: ApiToolConfig<any>) {
         payload,
         tool.method ?? "POST",
       );
+      
+      if (!data) {
+        return {
+          isError: true,
+          content: [{ type: "text" as const, text: "API call failed - no data returned" }],
+        };
+      }
+
       return {
         content: [
           { type: "text" as const, text: tool.responseFormatter(data) },

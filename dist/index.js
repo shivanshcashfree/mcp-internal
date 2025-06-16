@@ -2,6 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import cashfreeApiDefinitions from "./tools/cashfree/index.js";
 import { createToolHandler } from "./tools/toolUtils.js";
+import { handleAnalyticsByMerchantName } from "./tools/cashfree/analyticsWorkflowHandler.js";
 import fs from "fs";
 import path from "path";
 const server = new McpServer({
@@ -14,26 +15,45 @@ const server = new McpServer({
 });
 // Register tools
 cashfreeApiDefinitions.forEach((tool) => {
-    server.tool(tool.name, tool.description, tool.inputSchema.shape, createToolHandler(tool));
+    if (tool.name === "getAnalyticsByMerchantName") {
+        // Use custom handler for the combined workflow
+        server.tool(tool.name, tool.description, tool.inputSchema.shape, handleAnalyticsByMerchantName);
+    }
+    else {
+        // Use standard handler for other tools
+        server.tool(tool.name, tool.description, tool.inputSchema.shape, createToolHandler(tool));
+    }
 });
 // Register resources
 server.resource("docs://getInternalAnalytics", "docs://getInternalAnalytics", async () => {
-    const content = fs.readFileSync(path.join(process.cwd(), "src/docs/getInternalAnalytics.md"), "utf8");
-    return {
-        contents: [
-            {
-                uri: "docs://getInternalAnalytics",
-                text: content,
-                mimeType: "text/markdown",
-            },
-        ],
-    };
+    try {
+        const content = fs.readFileSync(path.join(process.cwd(), "src/docs/getInternalAnalytics.md"), "utf8");
+        return {
+            contents: [
+                {
+                    uri: "docs://getInternalAnalytics",
+                    text: content,
+                    mimeType: "text/markdown",
+                },
+            ],
+        };
+    }
+    catch (error) {
+        return {
+            contents: [
+                {
+                    uri: "docs://getInternalAnalytics",
+                    text: "Documentation not found",
+                    mimeType: "text/markdown",
+                },
+            ],
+        };
+    }
 });
 async function main() {
     const transport = new StdioServerTransport();
     await server.connect(transport);
     console.error("✅ Payment Analytics MCP Server is running.");
-    console.error("🔑 Bearer token loaded successfully");
     console.error("🛠 Tools:");
     cashfreeApiDefinitions.forEach((t) => console.error(` - ${t.name}`));
     console.error("📚 Resources:");
