@@ -1,5 +1,5 @@
 import { makeApiCall } from "../lib/apiClient.js";
-import { CASHFREE_API_BASE_URL, BEARER_TOKEN } from "../config/constants.js";
+import { CASHFREE_API_BASE_URL } from "../config/constants.js";
 import { ApiToolConfig } from "./cashfree/types.js";
 
 export function createToolHandler(tool: ApiToolConfig<any>) {
@@ -11,7 +11,6 @@ export function createToolHandler(tool: ApiToolConfig<any>) {
         CASHFREE_API_BASE_URL,
         tool.apiEndpoint,
         payload,
-        `Bearer ${BEARER_TOKEN}`,
         tool.method ?? "POST",
       );
       return {
