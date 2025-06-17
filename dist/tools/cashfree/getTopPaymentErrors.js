@@ -4,7 +4,7 @@ import { baseCashfreeToolArgs } from "../types.js";
 const getTopPaymentErrors = {
     name: "getTopPaymentErrors",
     description: "Get high-frequency payment error causes categorized by source, mode, and platform context.",
-    apiEndpoint: "/api/merchant/v1/router/analytics/top-errors",
+    apiEndpoint: "/dexter-report/v1/router/analytics/top-errors",
     inputSchema: baseCashfreeToolArgs.extend({
         paymentModes: z.array(z.string()).optional(),
         psps: z.array(z.string()).optional(),

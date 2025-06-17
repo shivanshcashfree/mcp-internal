@@ -59,6 +59,27 @@ server.resource(
   },
 );
 
+server.resource(
+  "docs://getTopPaymentErrors",
+  "docs://getTopPaymentErrors",
+  async () => {
+    const content = fs.readFileSync(
+      path.join(process.cwd(), "src/docs/getTopPaymentErrors.md"),
+      "utf8",
+    );
+    return {
+      contents: [
+        {
+          uri: "docs://getTopPaymentErrors",
+          text: content,
+          mimeType: "text/markdown",
+        },
+      ],
+    };
+  },
+);
+
+
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
@@ -67,6 +88,7 @@ async function main() {
   cashfreeApiDefinitions.forEach((t) => console.error(` - ${t.name}`));
   console.error("📚 Resources:");
   console.error(" - docs://getInternalAnalytics");
+  console.error(" - docs://getTopPaymentErrors");
 }
 
 main().catch((err) => {
