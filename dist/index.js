@@ -2,7 +2,6 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import cashfreeApiDefinitions from "./tools/cashfree/index.js";
 import { createToolHandler } from "./tools/toolUtils.js";
-import { handleAnalyticsByMerchantName } from "./tools/cashfree/analyticsWorkflowHandler.js";
 import fs from "fs";
 import path from "path";
 const server = new McpServer({
@@ -15,14 +14,7 @@ const server = new McpServer({
 });
 // Register tools
 cashfreeApiDefinitions.forEach((tool) => {
-    if (tool.name === "getAnalyticsByMerchantName") {
-        // Use custom handler for the combined workflow
-        server.tool(tool.name, tool.description, tool.inputSchema.shape, handleAnalyticsByMerchantName);
-    }
-    else {
-        // Use standard handler for other tools
-        server.tool(tool.name, tool.description, tool.inputSchema.shape, createToolHandler(tool));
-    }
+    server.tool(tool.name, tool.description, tool.inputSchema.shape, createToolHandler(tool));
 });
 // Register resources
 server.resource("docs://getInternalAnalytics", "docs://getInternalAnalytics", async () => {

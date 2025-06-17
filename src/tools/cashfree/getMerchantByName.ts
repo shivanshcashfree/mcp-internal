@@ -3,7 +3,7 @@ import { ApiToolConfig } from "./types.js";
 
 const getMerchantByName: ApiToolConfig = {
   name: "getMerchantByName",
-  description: "Get merchant ID(s) from merchant name. Returns merchant details including ID, name, email, phone, and other information.",
+  description: "Converts merchant name to merchant ID. Use this tool when the user provides a merchant name instead of a merchant ID. Returns one or more merchant IDs that match the provided merchant name.",
   apiEndpoint: "/commonmerchantsvc/merchants",
   inputSchema: z.object({
     merchantName: z.string().describe("Merchant name to search for"),
