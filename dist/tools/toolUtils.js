@@ -11,9 +11,13 @@ export function createToolHandler(tool) {
                     content: [{ type: "text", text: "API call failed - no data returned" }],
                 };
             }
+            const formattedResponse = tool.responseFormatter(data);
+            const responseText = typeof formattedResponse === 'string'
+                ? formattedResponse
+                : JSON.stringify(formattedResponse, null, 2);
             return {
                 content: [
-                    { type: "text", text: tool.responseFormatter(data) },
+                    { type: "text", text: responseText },
                 ],
             };
         }

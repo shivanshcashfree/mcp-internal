@@ -6,7 +6,7 @@ export interface ApiToolConfig<TArgs extends object = any> {
   apiEndpoint: string;
   inputSchema: ZodObject<any>;
   payloadMapper: (args: TArgs) => Record<string, any>;
-  responseFormatter: (data: any) => string;
+  responseFormatter: (data: any) => string | object;
   method?: "GET" | "POST";
   resources?: string[];
 }

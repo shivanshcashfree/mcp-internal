@@ -21,9 +21,14 @@ export function createToolHandler(tool: ApiToolConfig<any>) {
         };
       }
 
+      const formattedResponse = tool.responseFormatter(data);
+      const responseText = typeof formattedResponse === 'string' 
+        ? formattedResponse 
+        : JSON.stringify(formattedResponse, null, 2);
+
       return {
         content: [
-          { type: "text" as const, text: tool.responseFormatter(data) },
+          { type: "text" as const, text: responseText },
         ],
       };
     } catch (error: any) {

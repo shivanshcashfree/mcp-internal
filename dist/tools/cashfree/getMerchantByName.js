@@ -1,4 +1,14 @@
 import { z } from "zod";
+// Response schema for getMerchantByName
+export const getMerchantByNameResponseSchema = z.object({
+    success: z.boolean(),
+    message: z.string(),
+    merchants: z.array(z.object({
+        id: z.number(),
+        name: z.string()
+    })),
+    totalCount: z.number()
+});
 const getMerchantByName = {
     name: "getMerchantByName",
     description: "Converts merchant name to merchant ID. Use this tool when the user provides a merchant name instead of a merchant ID. Returns one or more merchant IDs that match the provided merchant name.",
@@ -13,27 +23,36 @@ const getMerchantByName = {
     }),
     responseFormatter: (data) => {
         if (!data || !data.content) {
-            return "No merchants found with the given name.";
+            const response = {
+                success: false,
+                message: "No merchants found with the given name.",
+                merchants: [],
+                totalCount: 0
+            };
+            return getMerchantByNameResponseSchema.parse(response);
         }
         const merchants = data.content;
-        const totalElements = data.totalElements || merchants.length;
-        if (merchants.length === 0) {
-            return "No merchants found with the given name.";
+        // Filter only active merchants (paymentActive = 1)
+        const activeMerchants = merchants.filter((merchant) => merchant.paymentActive === 1);
+        if (activeMerchants.length === 0) {
+            const response = {
+                success: false,
+                message: "No active merchants found with the given name. Found merchants but they are not payment active.",
+                merchants: [],
+                totalCount: 0
+            };
+            return getMerchantByNameResponseSchema.parse(response);
         }
-        if (merchants.length === 1) {
-            const merchant = merchants[0];
-            return `Found 1 merchant:
-Merchant ID: ${merchant.id}
-
-You can now use merchant ID ${merchant.id} for analytics queries.`;
-        }
-        // Multiple merchants found
-        let response = `Found ${totalElements} merchants matching the search:\n\n`;
-        merchants.forEach((merchant, index) => {
-            response += `${index + 1}. Merchant ID: ${merchant.id}\n`;
-        });
-        response += `\nDo not pickup the most frequent or old ID by yourself, instead please ask the user which merchant ID do they want to use for analytics by displaying all the ${totalElements} merchant IDs.`;
-        return response;
+        const response = {
+            success: true,
+            message: `Found ${activeMerchants.length} active merchant${activeMerchants.length === 1 ? '' : 's'} matching the search. Do not pickup any ID by yourself, instead please ask the user which merchant ID do they want to use for analytics by listing all the ${activeMerchants}`,
+            merchants: activeMerchants.map((merchant) => ({
+                id: merchant.id,
+                name: merchant.merchantName || merchant.name || 'Unknown'
+            })),
+            totalCount: activeMerchants.length,
+        };
+        return getMerchantByNameResponseSchema.parse(response);
     },
 };
 export default getMerchantByName;
