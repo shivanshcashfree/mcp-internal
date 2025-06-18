@@ -3,6 +3,22 @@ import { formatDateTimeForCashfree } from "../../lib/formatters.js";
 import { baseCashfreeToolArgs } from "../types.js";
 import { ApiToolConfig } from "./types.js";
 
+// Response schema for getTopPaymentErrors
+export const getTopPaymentErrorsResponseSchema = z.object({
+  success: z.boolean(),
+  status: z.string(),
+  data: z.array(
+    z.object({
+      errorDescription: z.string(),
+      source: z.string(),
+      errorCount: z.union([z.string(), z.number()]),
+      errorRate: z.union([z.string(), z.number()]),
+      paymentMode: z.string(),
+      pg: z.string(),
+    })
+  ),
+});
+
 const getTopPaymentErrors: ApiToolConfig = {
   name: "getTopPaymentErrors",
   description:
@@ -30,8 +46,13 @@ const getTopPaymentErrors: ApiToolConfig = {
     cardType: args.cardType,
     platforms: args.platforms,
   }),
-  responseFormatter: (data) =>
-    `Top Payment Errors:\n${JSON.stringify(data, null, 2)}`,
+  responseFormatter: (data) => {
+    const response = {
+      success: true,
+      ...data,
+    };
+    return getTopPaymentErrorsResponseSchema.parse(response);
+  },
 };
 
 export default getTopPaymentErrors;

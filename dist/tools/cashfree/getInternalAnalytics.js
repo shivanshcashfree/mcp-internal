@@ -1,6 +1,32 @@
 import { z } from "zod";
 import { formatDateTimeForCashfree } from "../../lib/formatters.js";
 import { baseCashfreeToolArgs } from "../types.js";
+// Response schema for getInternalAnalytics
+export const getInternalAnalyticsResponseSchema = z.object({
+    success: z.boolean(),
+    message: z.string().nullable(),
+    currentTime: z.string(),
+    totalCount: z.number(),
+    totalSuccessfulCount: z.number(),
+    totalAmount: z.number(),
+    data: z.array(z.object({
+        category: z.string(),
+        nextAggregateTerm: z.string().optional(),
+        filterTerm: z.string().optional(),
+        totalCount: z.number(),
+        totalSuccessfulCount: z.number(),
+        totalAmount: z.number(),
+        dataPoints: z.array(z.object({
+            startTime: z.string(),
+            count: z.number(),
+            successfulCount: z.number(),
+            amount: z.number(),
+            technicalDeclineCount: z.number(),
+            userDeclineCount: z.number(),
+            bankDeclineCount: z.number(),
+        }))
+    }))
+});
 const getInternalAnalytics = {
     name: "getInternalAnalytics",
     description: `Retrieves detailed transaction analytics for a specific merchant ID, including payment method breakdowns, transaction counts, amounts, and success/failure rates over time. 
@@ -36,6 +62,12 @@ CARD-specific filters:
         merchantId: args.merchantId,
         filter: args.filter ?? {},
     }),
-    responseFormatter: (data) => `Internal Transaction Analytics:\n${JSON.stringify(data, null, 2)}`,
+    responseFormatter: (data) => {
+        const response = {
+            success: true,
+            ...data
+        };
+        return getInternalAnalyticsResponseSchema.parse(response);
+    },
 };
 export default getInternalAnalytics;
