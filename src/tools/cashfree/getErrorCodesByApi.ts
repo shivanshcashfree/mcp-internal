@@ -36,6 +36,9 @@ const getErrorCodesByApi: ApiToolConfig = {
   responseFormatter: (data) => {
     return getErrorCodesByApiResponseSchema.parse(data);
   },
+  enableRetry: true,
+  maxRetries: 2,
+  backoffSeconds: 5,
 };
 
 export default getErrorCodesByApi;

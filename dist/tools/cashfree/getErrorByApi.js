@@ -25,5 +25,8 @@ const getErrorByApi = {
     responseFormatter: (data) => {
         return getErrorByApiResponseSchema.parse(data);
     },
+    enableRetry: true,
+    maxRetries: 2,
+    backoffSeconds: 5,
 };
 export default getErrorByApi;

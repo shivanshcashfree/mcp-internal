@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { formatDateForDexter } from "../../lib/formatters.js";
 import { extendedDexterToolArgs } from "../types.js";
-// Schema for the input args (extends base with required path, method, and error_code)
 // Response schema for getErrorMessageByCode
 export const getErrorMessageByCodeResponseSchema = z.object({
     success: z.boolean(),
@@ -30,5 +29,8 @@ const getErrorMessageByCode = {
     responseFormatter: (data) => {
         return getErrorMessageByCodeResponseSchema.parse(data);
     },
+    enableRetry: true,
+    maxRetries: 2,
+    backoffSeconds: 5,
 };
 export default getErrorMessageByCode;
