@@ -2,25 +2,16 @@ import { z } from "zod";
 import { formatDateForDexter } from "../../lib/formatters.js";
 import { extendedDexterToolArgs } from "../types.js";
 // Schema for the input args (extends base with required path, method, and error_code)
-// Response schema for getErrorMessageByCode (handles both success and error responses)
-export const getErrorMessageByCodeResponseSchema = z.union([
-    z.object({
-        success: z.literal(true),
-        message: z.any(), // Success response structure may vary
-    }),
-    z.object({
-        success: z.literal(false),
-        title: z.string(),
-        detail: z.string(),
-        errors: z.object({
-            errors: z.array(z.object({
-                msg: z.string(),
-                param: z.string(),
-                location: z.string(),
-            })),
+// Response schema for getErrorMessageByCode
+export const getErrorMessageByCodeResponseSchema = z.object({
+    success: z.boolean(),
+    message: z.array(z.object({
+        map: z.object({
+            message: z.string(),
         }),
-    }),
-]);
+        empty: z.boolean(),
+    })),
+});
 const getErrorMessageByCode = {
     name: "getErrorMessageByCode",
     description: "Get detailed error messages by error code: requires path, method from getErrorByApi tool and error code from getErrorCodesByApi tool. This is the final step in the error analysis flow, providing detailed error messages and context for specific error occurrences.",
