@@ -1,4 +1,8 @@
 // src/lib/apiClient.ts
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 /**
  * Makes an API call with retry logic for tools that return empty data when DB queries are still processing.
@@ -48,50 +52,55 @@ export async function makeApiCallWithRetry(
 export async function makeApiCall(
   baseUrl: string,
   endpoint: string,
-  payload: Record<string, any>,
-  method: "POST" | "GET" = "POST", // Add method param, default POST
-): Promise<any | null> {
-  let fullUrl = `${baseUrl}${endpoint}`;
-  let fetchOptions: any = {
-    method,
-    headers: {
-      "Content-Type": "application/json",
-    },
+  data: any,
+  method: "GET" | "POST" = "POST"
+): Promise<any> {
+  const url = `${baseUrl}${endpoint}`;
+  
+  // Determine headers based on the base URL
+  let headers: Record<string, string> = {
+    "Content-Type": "application/json",
   };
-  if (method === "GET") {
-    // Append params to URL for GET
-    const params = new URLSearchParams(payload).toString();
-    fullUrl += `?${params}`;
-  } else {
-    fetchOptions.body = JSON.stringify(payload, null, 2);
+
+  // Add OpenAI API key if calling OpenAI API
+  if (baseUrl.includes('api.openai.com')) {
+    const openaiApiKey = process.env.OPENAI_API_KEY;
+    if (!openaiApiKey) {
+      throw new Error('OPENAI_API_KEY environment variable is not set');
+    }
+    headers.Authorization = `Bearer ${openaiApiKey}`;
   }
 
   console.error(`\n--- API Call Details ---`);
-  console.error(`[API Client] Calling API: ${fullUrl}`);
+  console.error(`[API Client] Calling API: ${url}`);
   console.error(`[API Client] Method: ${method}`);
   console.error(`[API Client] Headers:`);
   console.error(`    Content-Type: application/json`);
   if (method !== "GET") {
-    console.error(`[API Client] Request Body:\n${fetchOptions.body}`);
+    console.error(`[API Client] Request Body:\n${JSON.stringify(data, null, 2)}`);
   }
   console.error(`------------------------\n`);
 
   try {
-    const res = await fetch(fullUrl, fetchOptions);
+    const response = await fetch(url, {
+      method,
+      headers,
+      body: method === "POST" ? JSON.stringify(data) : undefined,
+    });
 
-    const responseText = await res.text();
+    const responseText = await response.text();
     console.error(`\n--- API Response Details ---`);
     console.error(
-      `[API Client] Response Status: ${res.status} ${res.statusText}`,
+      `[API Client] Response Status: ${response.status} ${response.statusText}`,
     );
     console.error(`[API Client] Raw Response Body:\n${responseText}`);
     console.error(`---------------------------\n`);
 
-    if (!res.ok) {
+    if (!response.ok) {
       console.error(
-        `[API Client] API call failed: ${res.status} - ${responseText}`,
+        `[API Client] API call failed: ${response.status} - ${responseText}`,
       );
-      throw new Error(`API error ${res.status}: ${responseText}`);
+      throw new Error(`API error ${response.status}: ${responseText}`);
     }
 
     try {
@@ -105,7 +114,7 @@ export async function makeApiCall(
     }
   } catch (err) {
     console.error(
-      `[API Client] Fatal error during API call to ${fullUrl}:`,
+      `[API Client] Fatal error during API call to ${url}:`,
       err,
     );
     return null;
