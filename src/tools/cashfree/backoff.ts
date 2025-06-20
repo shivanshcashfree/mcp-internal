@@ -13,7 +13,8 @@ export const backoffResponseSchema = z.object({
 const backoff: ApiToolConfig = {
   name: "backoff",
   description: "Back off for a specified time to avoid hitting rate limits. Checks API rate limit status and waits if necessary to prevent throttling.",
-  apiEndpoint: "/v1/responses", // This will be appended to a different base URL
+  apiEndpoint: "/v1/responses",
+  baseUrl: "https://api.openai.com", 
   inputSchema: z.object({
     model: z.string().optional().default("gpt-4.1").describe("Model to check rate limits for"),
     waitTimeSeconds: z.number().optional().default(40).describe("Time to wait in seconds if rate limit is low"),

@@ -6,10 +6,11 @@ export function createToolHandler(tool: ApiToolConfig<any>) {
   return async (args: any) => {
     try {
       const payload = tool.payloadMapper(args);
+      const baseUrl = tool.baseUrl || CASHFREE_API_BASE_URL; 
 
       const data = tool.enableRetry 
         ? await makeApiCallWithRetry(
-            CASHFREE_API_BASE_URL,
+            baseUrl,
             tool.apiEndpoint,
             payload,
             tool.method ?? "POST",
@@ -17,7 +18,7 @@ export function createToolHandler(tool: ApiToolConfig<any>) {
             tool.backoffSeconds ?? 5,
           )
         : await makeApiCall(
-            CASHFREE_API_BASE_URL,
+            baseUrl,
             tool.apiEndpoint,
             payload,
             tool.method ?? "POST",
