@@ -49,6 +49,25 @@ export async function makeApiCallWithRetry(
   return null;
 }
 
+/**
+ * Checks rate limit headers and implements backoff if needed
+ * @param response The fetch response object
+ * @returns Promise that resolves after backoff (if needed)
+ */
+async function handleRateLimit(response: Response): Promise<void> {
+  const remainingTokens = parseInt(response.headers.get('x-ratelimit-remaining-tokens') || '0');
+  const maxTokensFromHeader = parseInt(response.headers.get('x-ratelimit-limit-tokens') || '0');
+
+  if (remainingTokens && maxTokensFromHeader) {
+    const remainingPercentage = (remainingTokens / maxTokensFromHeader) * 100;
+
+    if (remainingPercentage < 50) {
+      console.error(`[API Client] Rate limit below 50% (${remainingPercentage.toFixed(2)}%). Waiting 40 seconds...`);
+      await new Promise((resolve) => setTimeout(resolve, 40000));
+    }
+  }
+}
+
 export async function makeApiCall(
   baseUrl: string,
   endpoint: string,
@@ -88,11 +107,25 @@ export async function makeApiCall(
       body: method === "POST" ? JSON.stringify(data) : undefined,
     });
 
+    // Handle rate limiting for OpenAI API calls
+    if (baseUrl.includes('api.openai.com')) {
+      await handleRateLimit(response);
+    }
+
     const responseText = await response.text();
     console.error(`\n--- API Response Details ---`);
     console.error(
       `[API Client] Response Status: ${response.status} ${response.statusText}`,
     );
+    
+    // Log rate limit info if available
+    const remainingTokens = response.headers.get('x-ratelimit-remaining-tokens');
+    const maxTokens = response.headers.get('x-ratelimit-limit-tokens');
+    if (remainingTokens && maxTokens) {
+      const remainingPercentage = (parseInt(remainingTokens) / parseInt(maxTokens)) * 100;
+      console.error(`[API Client] Rate Limit: ${remainingTokens}/${maxTokens} tokens remaining (${remainingPercentage.toFixed(2)}%)`);
+    }
+    
     console.error(`[API Client] Raw Response Body:\n${responseText}`);
     console.error(`---------------------------\n`);
 
