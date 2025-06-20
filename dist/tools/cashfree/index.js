@@ -5,6 +5,7 @@ import getIncidents from "./getIncidents.js";
 import getErrorByApi from "./getErrorByApi.js";
 import getErrorCodesByApi from "./getErrorCodesByApi.js";
 import getErrorMessageByCode from "./getErrorMessageByCode.js";
+import backoff from "./backoff.js";
 export const cashfreeApiDefinitions = [
     getMerchantByName,
     getInternalAnalytics,
@@ -13,6 +14,7 @@ export const cashfreeApiDefinitions = [
     getErrorByApi,
     getErrorCodesByApi,
     getErrorMessageByCode,
+    backoff,
 ];
 export default cashfreeApiDefinitions;
-export { getInternalAnalytics, getMerchantByName, getTopPaymentErrors, getIncidents, getErrorByApi, getErrorCodesByApi, getErrorMessageByCode, };
+export { getInternalAnalytics, getMerchantByName, getTopPaymentErrors, getIncidents, getErrorByApi, getErrorCodesByApi, getErrorMessageByCode, backoff, };

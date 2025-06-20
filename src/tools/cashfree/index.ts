@@ -5,6 +5,7 @@ import getIncidents from "./getIncidents.js";
 import getErrorByApi from "./getErrorByApi.js";
 import getErrorCodesByApi from "./getErrorCodesByApi.js";
 import getErrorMessageByCode from "./getErrorMessageByCode.js";
+import backoff from "./backoff.js";
 import { ApiToolConfig } from "./types.js";
 
 export const cashfreeApiDefinitions: ApiToolConfig[] = [
@@ -15,6 +16,7 @@ export const cashfreeApiDefinitions: ApiToolConfig[] = [
   getErrorByApi,
   getErrorCodesByApi,
   getErrorMessageByCode,
+  backoff,
 ];
 
 export default cashfreeApiDefinitions;
@@ -26,5 +28,6 @@ export {
   getErrorByApi,
   getErrorCodesByApi,
   getErrorMessageByCode,
+  backoff,
   ApiToolConfig,
 };
