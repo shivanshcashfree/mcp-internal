@@ -7,6 +7,7 @@ import getErrorCodesByApi from "./getErrorCodesByApi.js";
 import getErrorMessageByCode from "./getErrorMessageByCode.js";
 import getOrderAnalytics from "./getOrderAnalytics.js";
 import getCustomerDistribution from "./getCustomerDistribution.js";
+import getErrorAggregates from "./getErrorAggregates.js";
 import { ApiToolConfig } from "./types.js";
 
 export const cashfreeApiDefinitions: ApiToolConfig[] = [
@@ -19,6 +20,7 @@ export const cashfreeApiDefinitions: ApiToolConfig[] = [
   getErrorMessageByCode,
   getOrderAnalytics,
   getCustomerDistribution,
+  getErrorAggregates,
 ];
 
 export default cashfreeApiDefinitions;
@@ -32,5 +34,6 @@ export {
   getErrorMessageByCode,
   getOrderAnalytics,
   getCustomerDistribution,
+  getErrorAggregates,
   ApiToolConfig,
 };

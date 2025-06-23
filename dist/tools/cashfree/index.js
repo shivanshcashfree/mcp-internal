@@ -7,6 +7,7 @@ import getErrorCodesByApi from "./getErrorCodesByApi.js";
 import getErrorMessageByCode from "./getErrorMessageByCode.js";
 import getOrderAnalytics from "./getOrderAnalytics.js";
 import getCustomerDistribution from "./getCustomerDistribution.js";
+import getErrorAggregates from "./getErrorAggregates.js";
 export const cashfreeApiDefinitions = [
     getMerchantByName,
     getInternalAnalytics,
@@ -17,6 +18,7 @@ export const cashfreeApiDefinitions = [
     getErrorMessageByCode,
     getOrderAnalytics,
     getCustomerDistribution,
+    getErrorAggregates,
 ];
 export default cashfreeApiDefinitions;
-export { getInternalAnalytics, getMerchantByName, getTopPaymentErrors, getIncidents, getErrorByApi, getErrorCodesByApi, getErrorMessageByCode, getOrderAnalytics, getCustomerDistribution, };
+export { getInternalAnalytics, getMerchantByName, getTopPaymentErrors, getIncidents, getErrorByApi, getErrorCodesByApi, getErrorMessageByCode, getOrderAnalytics, getCustomerDistribution, getErrorAggregates, };
