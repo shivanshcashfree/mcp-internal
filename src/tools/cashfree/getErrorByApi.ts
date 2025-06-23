@@ -29,7 +29,7 @@ const getErrorByApi: ApiToolConfig = {
     return getErrorByApiResponseSchema.parse(data);
   },
   enableRetry: true,
-  maxRetries: 2,
+  maxRetries: 3,
   backoffSeconds: 5,
 };
 
