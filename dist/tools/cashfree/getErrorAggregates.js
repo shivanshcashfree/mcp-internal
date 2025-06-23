@@ -3,6 +3,7 @@ import { formatDateTimeForCashfree } from "../../lib/formatters.js";
 import { baseCashfreeToolArgs } from "../types.js";
 // Response schema for getErrorAggregates
 export const getErrorAggregatesResponseSchema = z.object({
+    message: z.string().nullable(),
     currentTime: z.string(),
     totalCount: z.number(),
     totalFavourableCount: z.number(),
@@ -33,11 +34,6 @@ export const getErrorAggregatesResponseSchema = z.object({
             technicalDeclineCount: z.number(),
             userDeclineCount: z.number(),
             bankDeclineCount: z.number(),
-            successRate: z.number(),
-            successRateWithoutUD: z.number(),
-            userDeclineRate: z.number(),
-            technicalDeclineRate: z.number(),
-            bankDeclineRate: z.number(),
         }))
     }))
 });
