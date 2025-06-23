@@ -33,7 +33,7 @@ const getErrorCodesByApi = {
         return getErrorCodesByApiResponseSchema.parse(data);
     },
     enableRetry: true,
-    maxRetries: 2,
+    maxRetries: 3,
     backoffSeconds: 5,
 };
 export default getErrorCodesByApi;

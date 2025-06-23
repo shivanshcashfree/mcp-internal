@@ -4,9 +4,16 @@ export function createToolHandler(tool) {
     return async (args) => {
         try {
             const payload = tool.payloadMapper(args);
+            // Handle special case where merchantId needs to be appended to URL
+            let endpoint = tool.apiEndpoint;
+            if (payload._merchantIdForUrl) {
+                endpoint = `${tool.apiEndpoint}/${payload._merchantIdForUrl}`;
+                // Remove the special property from payload
+                delete payload._merchantIdForUrl;
+            }
             const data = tool.enableRetry
-                ? await makeApiCallWithRetry(CASHFREE_API_BASE_URL, tool.apiEndpoint, payload, tool.method ?? "POST", tool.maxRetries ?? 3, tool.backoffSeconds ?? 5)
-                : await makeApiCall(CASHFREE_API_BASE_URL, tool.apiEndpoint, payload, tool.method ?? "POST");
+                ? await makeApiCallWithRetry(CASHFREE_API_BASE_URL, endpoint, payload, tool.method ?? "POST", tool.maxRetries ?? 3, tool.backoffSeconds ?? 5)
+                : await makeApiCall(CASHFREE_API_BASE_URL, endpoint, payload, tool.method ?? "POST");
             if (!data) {
                 return {
                     isError: true,

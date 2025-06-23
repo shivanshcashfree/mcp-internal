@@ -1,17 +1,16 @@
 import { z } from "zod";
 import { formatDateTimeForCashfree } from "../../lib/formatters.js";
 import { baseCashfreeToolArgs } from "../types.js";
-// Response schema for getTopPaymentErrors
+// Response schema for getTopPaymentErrors (adapted to actual response)
 export const getTopPaymentErrorsResponseSchema = z.object({
-    success: z.boolean(),
-    status: z.string(),
-    data: z.array(z.object({
+    message: z.string().nullable(),
+    transactionErrorDetails: z.array(z.object({
         errorDescription: z.string(),
         source: z.string(),
-        errorCount: z.union([z.string(), z.number()]),
         errorRate: z.union([z.string(), z.number()]),
-        paymentMode: z.string(),
+        errorCount: z.union([z.string(), z.number()]),
         pg: z.string(),
+        paymentMode: z.string(),
     })),
 });
 const getTopPaymentErrors = {
@@ -41,11 +40,8 @@ const getTopPaymentErrors = {
         platforms: args.platforms,
     }),
     responseFormatter: (data) => {
-        const response = {
-            success: true,
-            ...data,
-        };
-        return getTopPaymentErrorsResponseSchema.parse(response);
+        // No need to add 'success' or 'status', just parse the raw response
+        return getTopPaymentErrorsResponseSchema.parse(data);
     },
 };
 export default getTopPaymentErrors;
