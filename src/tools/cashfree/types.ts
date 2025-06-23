@@ -12,4 +12,5 @@ export interface ApiToolConfig<TArgs extends object = any> {
   enableRetry?: boolean; // Enable retry logic for tools that may return empty data during DB processing
   maxRetries?: number; // Maximum number of retries (default 3)
   backoffSeconds?: number; // Seconds to wait between retries (default 5)
+  handler?: (payload: TArgs) => Promise<any>; // <-- add this
 }

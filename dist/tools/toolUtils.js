@@ -4,16 +4,36 @@ export function createToolHandler(tool) {
     return async (args) => {
         try {
             const payload = tool.payloadMapper(args);
+            // If the tool has a direct handler (for elasticsearch), use it
+            if (typeof tool.handler === 'function') {
+                const data = await tool.handler(payload);
+                const formattedResponse = tool.responseFormatter(data);
+                const responseText = typeof formattedResponse === 'string'
+                    ? formattedResponse
+                    : JSON.stringify(formattedResponse, null, 2);
+                return {
+                    content: [
+                        { type: "text", text: responseText },
+                    ],
+                };
+            }
             // Handle special case where merchantId needs to be appended to URL
             let endpoint = tool.apiEndpoint;
             if (payload._merchantIdForUrl) {
                 endpoint = `${tool.apiEndpoint}/${payload._merchantIdForUrl}`;
-                // Remove the special property from payload
                 delete payload._merchantIdForUrl;
             }
+            // --- CHANGED: Select base URL dynamically ---
+            let baseUrl;
+            if (endpoint.startsWith("/elasticsearch/")) {
+                baseUrl = process.env.ES_URL || "http://localhost:9200";
+            }
+            else {
+                baseUrl = CASHFREE_API_BASE_URL;
+            }
             const data = tool.enableRetry
-                ? await makeApiCallWithRetry(CASHFREE_API_BASE_URL, endpoint, payload, tool.method ?? "POST", tool.maxRetries ?? 3, tool.backoffSeconds ?? 5)
-                : await makeApiCall(CASHFREE_API_BASE_URL, endpoint, payload, tool.method ?? "POST");
+                ? await makeApiCallWithRetry(baseUrl, endpoint, payload, tool.method ?? "POST", tool.maxRetries ?? 3, tool.backoffSeconds ?? 5)
+                : await makeApiCall(baseUrl, endpoint, payload, tool.method ?? "POST");
             if (!data) {
                 return {
                     isError: true,

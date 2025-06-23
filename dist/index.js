@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import cashfreeApiDefinitions from "./tools/cashfree/index.js";
+import elasticsearchToolDefinitions from "./tools/elastic-search/index.js";
 import { createToolHandler } from "./tools/toolUtils.js";
 import fs from "fs";
 import path from "path";
@@ -14,6 +15,10 @@ const server = new McpServer({
 });
 // Register tools
 cashfreeApiDefinitions.forEach((tool) => {
+    server.tool(tool.name, tool.description, tool.inputSchema.shape, createToolHandler(tool));
+});
+// Register elasticsearch tools
+elasticsearchToolDefinitions.forEach((tool) => {
     server.tool(tool.name, tool.description, tool.inputSchema.shape, createToolHandler(tool));
 });
 // Register resources
@@ -60,6 +65,7 @@ async function main() {
     console.error("✅ Payment Analytics MCP Server is running.");
     console.error("🛠 Tools:");
     cashfreeApiDefinitions.forEach((t) => console.error(` - ${t.name}`));
+    elasticsearchToolDefinitions.forEach((t) => console.error(` - ${t.name}`));
     console.error("📚 Resources:");
     console.error(" - docs://getInternalAnalytics");
     console.error(" - docs://getTopPaymentErrors");
